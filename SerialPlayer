@@ -1,29 +1,31 @@
-class SerialPlayer:
 
 ArrayList<ArrayList<string>> pathsToEpizodes
 
 function SerialPlayer(string serialName):
-  
-  string path = findSerialFolder(serialname);
+  string path = findSerialFolder(serialName);
   int serie, int episode = findEpisodToPlay(path);
   writePlayedEpisode(serie, episode);
   playEpisode(pathsToEpizodes[serie][episode]);
 
 function findSerialFolder(string serialName):
-  string path = findOnMyPC(serialName)
-  Array<string> folders = foldersInPath()
-  Array<string> episodes
-  for(i=0; i<folders.size(); i++):
-    episodes.clean();
-    forEach(episode in folders[i]):
-      apisodes.add(episode);
-    pathsToEpizodes.add(apisodes);
-
-  return path
+  try{
+    string path = findOnMyPC(serialName)
+    Array<string> folders = foldersInPath()
+    Array<string> episodes
+    for(i=0; i<folders.size(); i++):
+      episodes.clean();
+      forEach(episode in folders[i]):
+        apisodes.add(episode);
+      pathsToEpizodes.add(apisodes);
+    return path
+  }
+  catch(ErrorNotFount){
+    exit(FILE NOT FOUND)
+  }
 
 function findEpisodToPlay(string path):
   '''file should contains only one line in form sXxeYy | X,x,Y,y => {0..9}'''
-  int serie, int episode = readWatchedEpisodesFile(last_watched.txt)
+  int serie, int episode = readWatchedEpisodesFile(path+separator()+last_watched.txt)
 
   if(episodeExists(serie, episode++)):
     return (serie, episode++);
@@ -32,11 +34,17 @@ function findEpisodToPlay(string path):
   return (0, 0);
 
 function readWatchedEpisodesFile(string fileName):
-  int serie, episode;
-  open(filename, 'r') as file:
-    string line = file.readline();
-    serie = int(line[1] + line[2]);
-    episode = int(line[4] + line[5]);
+  int serie, episode = 0,0;
+  try{
+    open(filename, 'r') as file:
+      string line = file.readline();
+      serie = int(line[1] + line[2]);
+      episode = int(line[4] + line[5]);
+  }
+  catch(ErrorNotFound){
+    FILE NOT FOUND
+    First time you watch this serial.
+  }
   return (serie, episode);
 
 function episodeExists(s, e):
